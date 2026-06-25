@@ -4,3 +4,5 @@ golang/*.key
 golang/h2srv.exe
 golang/h2srv
 
+client/h2client.exe
+client/h2client
