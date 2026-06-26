@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	targetUrl   = flag.String("t", "https://[::1]:40443/dotnetapi/req-test", "url to test")
+	targetUrl   = flag.String("t", "https://127.0.0.1:40443/dotnetapi/req-test", "url to test")
 	targetProto = flag.String("proto", "h2,http1.1", "http protocol to test (h2, http1.1, or h2,http1.1)")
 	bodyLen     = flag.Int("len", 0, "body length (0 to any, default 0)")
 	encoding    = flag.String("enc", "chunked", `chunked for "Transfer-Encoding: chunked"; fixed for "Content-Length" fixed length`)
@@ -89,6 +89,9 @@ func main() {
 	case "fixed":
 		req.ContentLength = int64(len(dummyData))
 		req.TransferEncoding = nil
+		if *bodyLen == 0 {
+			req.Body = http.NoBody // same as http.NewRequest() do with nil body
+		}
 	default:
 		fallthrough
 	case "chunked":
