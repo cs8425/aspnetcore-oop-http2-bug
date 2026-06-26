@@ -46,7 +46,7 @@ The following are the core test cases utilized during validation and how they lo
     The tool establishes an HTTP/2 connection and sends two separate frames within the same stream:
     ```text
     [HTTP/2 Stream]
-    └── Frame 1: HEADERS Frame (Flags: NONE) -> Contains :method=GET, :path=... (No END_STREAM)
+    └── Frame 1: HEADERS Frame (Flags: END_HEADERS) -> Contains :method=GET, :path=... (No END_STREAM)
     └── Frame 2: DATA Frame    (Flags: END_STREAM) -> Empty data block (Length: 0)
     ```
 * **Backend Observations & Indicators:**
