@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"math/big"
 	"net/http"
@@ -67,16 +68,24 @@ func main() {
 		out := buf.Bytes()
 		log.Printf("[req]%v\n\n", string(out))
 		buf.WriteTo(w)
+
+		// block until read out all request body
+		defer r.Body.Close()
+		n, _ := io.Copy(io.Discard, r.Body)
+		fmt.Fprintf(w, "============================\nbody read: %v\n", n)
+		log.Printf("[req]%v %v %v: addr: %v body read: %v\n\n", r.Method, r.Proto, r.RequestURI, r.RemoteAddr, n)
 	})
 
 	// setup server
 	server := &http.Server{
-		Addr:         *bind,
-		Handler:      handler,
-		TLSConfig:    nil, // use nil to use the standard TLS setup
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
+		Addr:      *bind,
+		Handler:   handler,
+		TLSConfig: nil, // use nil to use the standard TLS setup
+
+		// disable timeout for large/slow upload test
+		// ReadTimeout:  5 * time.Second,
+		// WriteTimeout: 10 * time.Second,
+		IdleTimeout: 120 * time.Second,
 	}
 
 	log.Printf("Starting server on %v...\n", *bind)
