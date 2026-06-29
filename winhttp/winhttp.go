@@ -236,7 +236,11 @@ func main() {
 			chunkBuf.Write(wBuf[:wn])
 			fmt.Fprintf(chunkBuf, "\r\n")
 
-			fmt.Println("WinHttpWriteData:", i, written, wn, len(wBuf), chunkBuf.String()[:20])
+			printChunkSz := chunkBuf.Len()
+			if chunkBuf.Len() > 20 {
+				printChunkSz = 30
+			}
+			fmt.Println("WinHttpWriteData:", i, written, wn, len(wBuf), chunkBuf.String()[:printChunkSz])
 			n, err := WinHttpWriteData(hRequest, chunkBuf.Bytes())
 			if err != nil {
 				fmt.Println("WinHttpWriteData failed:", i, written, len(wBuf), n, err)
@@ -249,10 +253,10 @@ func main() {
 
 			time.Sleep(time.Duration(*bodySleep) * time.Millisecond)
 		}
-		n, err := WinHttpWriteData(hRequest, []byte("0\r\n\r\n"))
-		if err != nil {
-			fmt.Println("WinHttpWriteData failed:", n, err)
-		}
+	}
+	n, err := WinHttpWriteData(hRequest, []byte("0\r\n\r\n"))
+	if err != nil {
+		fmt.Println("WinHttpWriteData failed:", n, err)
 	}
 
 	// Receive the Response
